@@ -7,15 +7,15 @@ pipeline {
         stage('Build'){
             steps{
                 sh 'pip3 install --user --break-system-packages pipenv'
-                sh '/bitnami/jenkins/home/.local/bin/pipenv --rm || exit 0'
-                sh '/bitnami/jenkins/home/.local/bin/pipenv install'
+                sh '.local/bin/pipenv --rm || exit 0'
+                sh '.local/bin/pipenv install'
                 echo "build completed successful"
             }
         }
 
         stage('Test'){
             steps{
-                sh '/bitnami/jenkins/home/.local/bin/pipenv run pytest'
+                sh '.local/bin/pipenv run pytest'
                 echo "test completed successful"
             }
         }
