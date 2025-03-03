@@ -2,22 +2,23 @@ pipeline {
     agent any
     environment {
         LABS = credentials("labcreds")
+        PATH = "$HOME/.local/bin:$PATH"  // Add pipenv path
     }
     stages {
         stage('Build') {
             steps {
                 sh 'pip3 install --user --break-system-packages pipenv'
-                sh '$HOME/.local/bin/pipenv --rm || true'
-                sh '$HOME/.local/bin/pipenv install'
-                sh 'which python3'
-                sh '$HOME/.local/bin/pipenv --venv'
+                sh 'export PATH=$HOME/.local/bin:$PATH && pipenv --rm || true'
+                sh 'export PATH=$HOME/.local/bin:$PATH && pipenv install'
+                sh 'which pipenv'
+                sh 'pipenv --venv'
                 echo "Build completed successfully"
             }
         }
 
         stage('Test') {
             steps {
-                sh '$HOME/.local/bin/pipenv run pytest'
+                sh 'export PATH=$HOME/.local/bin:$PATH && pipenv run pytest'
                 echo "Test completed successfully"
             }
         }
