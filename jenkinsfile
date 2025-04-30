@@ -1,27 +1,39 @@
 pipeline {
     agent any
-    stages{
-        stage('Build'){
-            steps{
-                echo "build completed successful"
+    environment {
+        LABS = credentials("labcreds")
+        PATH = "$HOME/.local/bin:$PATH"  // Add pipenv path
+    }
+    stages {
+        stage('Build') {
+            steps {
+                sh 'pip3 install --user --break-system-packages pipenv'
+                sh 'export PATH=$HOME/.local/bin:$PATH && pipenv --rm || true'
+                sh 'export PATH=$HOME/.local/bin:$PATH && pipenv install'
+                sh 'which pipenv'
+                sh 'pipenv --venv'
+                echo "Build completed successfully"
             }
         }
 
-        stage('Test'){
-            steps{
-                echo "test completed successful"
+        stage('Test') {
+            steps {
+                sh 'export PATH=$HOME/.local/bin:$PATH && pipenv run pytest'
+                echo "Test completed successfully"
             }
         }
 
-        stage('Package'){
-            steps{
-                echo "package completed successful"
+        stage('Package') {
+            steps {
+                sh 'zip -r retailproject.zip .'
+                echo "Package completed successfully"
             }
         }
 
-        stage('Deploy'){
-            steps{
-                echo "deploy completed successful"
+        stage('Deploy') {
+            steps {
+                sh 'sshpass -p $LABS_PSW scp -o StrictHostKeyChecking=no -r . $LABS_USR@g02.itversity.com:/home/itv015105/retailproject'
+                echo "Deploy completed successfully"
             }
         }
     }
